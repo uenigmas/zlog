@@ -8,11 +8,11 @@
 #include "zlog.h"
 
 #ifdef PLATFORM_WIN32
-#   include <process.h>
-#   include <Windows.h>
+#include <process.h>
+#include <Windows.h>
 #else
-#   include <errno.h>
-#   include <unistd.h>
+#include <errno.h>
+#include <unistd.h>
 #endif
 
 #include <sys/stat.h>
@@ -37,7 +37,7 @@ namespace zlog
 	static FILE *log_file = nullptr;
 	static FILE *log_std = nullptr;
 	static bool haveInit = false;
-	static char *LogLevelName[] = {"TRACE","DEBUG","INFO ","WARN ","ERROR","FATAL"," OFF "};
+	static char *LogLevelName[] = {"TRACE", "DEBUG", "INFO ", "WARN ", "ERROR", "FATAL", " OFF "};
 
 #ifdef PLATFORM_WIN32
 	// 104857600 byte == 100 MiB
@@ -75,7 +75,8 @@ namespace zlog
 		string msg_(_strerror(NULL));
 		const size_t size_ = msg_.size();
 
-		if(size_) msg_.erase(size_ - 1);
+		if (size_)
+			msg_.erase(size_ - 1);
 
 		return msg_ + "(errno: " + int_to_str(errno) + ")";
 #else
@@ -87,7 +88,7 @@ namespace zlog
 	{
 		struct stat buf_;
 
-		if(stat(file_name.c_str(), &buf_) == 0)
+		if (stat(file_name.c_str(), &buf_) == 0)
 			return buf_.st_size;
 
 		return 0;
@@ -112,9 +113,9 @@ namespace zlog
 		auto p = log_config.cur_prog_name.c_str();
 		size_t i = 0;
 
-		for(i = len; i >= 0; i--)
+		for (i = len; i >= 0; i--)
 		{
-			if(p[i] == '\\' || p[i] == '/')
+			if (p[i] == '\\' || p[i] == '/')
 			{
 				i++;
 				break;
@@ -125,14 +126,14 @@ namespace zlog
 		auto log_name = log_config.log_dir + progname + "_" + int_to_str(pid_) + ".log";
 		const size_t old_log_size_ = get_size_in_byte(log_name);
 
-		if(old_log_size_ >= log_config.max_byte)
+		if (old_log_size_ >= log_config.max_byte)
 			// 覆盖
 			*file = fopen(log_name.c_str(), "wb");
 		else
 			// 追加
 			*file = fopen(log_name.c_str(), "ab+");
 
-		if(*file == NULL)
+		if (*file == NULL)
 		{
 			const string err_("cannot open \"" + log_config.log_dir + "\": " + errno_to_str());
 			cerr << err_ << endl;
@@ -145,7 +146,7 @@ namespace zlog
 
 		fprintf(log_stream, "[%s] [%s] [%d] ", LogLevelName[level], get_current_date().c_str(), line);
 
-		if(level <= LOG_DEBUG)
+		if (level <= LOG_DEBUG)
 			fprintf(log_stream, "%s:%d ", file, line);
 
 		va_list ap_;
@@ -160,25 +161,28 @@ namespace zlog
 		LogLevel_t level, const char *file, int line, const char *fmt, ...)
 	{
 		// 关闭日志
-		if(level == LOG_OFF) return;
+		if (level == LOG_OFF)
+			return;
 
 		// 关闭比用户设置更加详细的日志
 		//if(level < log_config.level) return;
 
-		if(haveInit == false)
+		if (haveInit == false)
 		{
 			haveInit = true;
-			(new std::thread([=]
-			{
-				std::this_thread::sleep_for(std::chrono::seconds(60));
-				if(log_file != nullptr)
-					fflush(log_file);
+			(new std::thread([=] {
+				while (true)
+				{
+					std::this_thread::sleep_for(std::chrono::seconds(60));
+					if (log_file != nullptr)
+						fflush(log_file);
+				}
 			}))->detach();
 		}
 
-		if(log_std == nullptr)
+		if (log_std == nullptr)
 		{
-			switch(log_config.output_to)
+			switch (log_config.output_to)
 			{
 			case LOGOUTPUTSTREAM_STDOUT:
 				log_std = stdout;
@@ -195,7 +199,7 @@ namespace zlog
 			}
 		}
 
-		if(log_file == nullptr)
+		if (log_file == nullptr)
 		{
 			open_log_file(&log_file);
 		}
@@ -203,9 +207,9 @@ namespace zlog
 		va_list ap_;
 		va_start(ap_, fmt);
 
-		if(log_std != nullptr && level > log_config.level)
+		if (log_std != nullptr && level > log_config.level)
 			log_to_stream(log_std, level, file, line, fmt, ap_);
-		if(log_file != nullptr && log_config.use_file_output)
+		if (log_file != nullptr && log_config.use_file_output)
 			log_to_stream(log_file, level, file, line, fmt, ap_);
 
 		va_end(ap_);
@@ -213,8 +217,9 @@ namespace zlog
 
 	void close_log_stream()
 	{
-		fflush(log_file);
+		fflush(log_std);
 
+		fflush(log_file);
 		fclose(log_file);
 		log_file = nullptr;
 	}
