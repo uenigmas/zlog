@@ -6,31 +6,21 @@
  *        Desc: 无任何非系统库依赖，功能简单的日志系统
  */
 
-#ifndef INCLUDE_ZPSOE_ZLOG_H_
-#define INCLUDE_ZPSOE_ZLOG_H_
+#pragma once
 
-#ifndef INCLUDE_ZPSOE_CONFIG_PLATFORM_H
-#define INCLUDE_ZPSOE_CONFIG_PLATFORM_H
-
- // Platform recognition
+// Platform recognition
 #if defined(WIN32) || defined(_WIN32)
-
 #define PLATFORM_WIN32 1
 
 #elif defined(__unix__) || defined(unix)
-
 #define PLATFORM_LINUX 1
 
 #else
-
 #error Unknown platform
 
 #endif
 
-#endif // INCLUDE_ZPSOE_CONFIG_PLATFORM_H
-
 #include <string>
-
 using namespace std;
 
 namespace zlog
@@ -66,19 +56,17 @@ namespace zlog
 
 	extern LogConfig_t log_config;
 
-	#define trace_print(fmt, ...) print_log(LOG_TRACE, fmt, __VA_ARGS__)
-	#define debug_print(fmt, ...) print_log(LOG_DEBUG, fmt, __VA_ARGS__)
-	#define info_print(fmt, ...)  print_log(LOG_INFO,  fmt, __VA_ARGS__)
-	#define warn_print(fmt, ...)  print_log(LOG_WARN,  fmt, __VA_ARGS__)
-	#define error_print(fmt, ...) print_log(LOG_ERROR, fmt, __VA_ARGS__)
-	#define fatal_print(fmt, ...) print_log(LOG_FATAL, fmt, __VA_ARGS__)
+#define trace_print(...) print_log(LOG_TRACE, __VA_ARGS__)
+#define debug_print(...) print_log(LOG_DEBUG, __VA_ARGS__)
+#define info_print(...) print_log(LOG_INFO, __VA_ARGS__)
+#define warn_print(...) print_log(LOG_WARN, __VA_ARGS__)
+#define error_print(...) print_log(LOG_ERROR, __VA_ARGS__)
+#define fatal_print(...) print_log(LOG_FATAL, __VA_ARGS__)
 
-	#define print_log(level, ...) _print_log(level, __FILE__, __LINE__, __VA_ARGS__)
+#define print_log(level, ...) _print_log(level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
 
-	void _print_log(LogLevel_t level, const char *file, int line, const char *fmt, ...);
+	void _print_log(LogLevel_t level, const char *file, const char *fn, int line, const char *fmt, ...);
 
 	void close_log_stream();
 
 } /* namespace zlog */
-
-#endif /* INCLUDE_ZPSOE_ZLOG_H_ */

@@ -4,7 +4,6 @@
  *  Created on: 2014年9月30日
  *      Author: Fifi Lyu
  */
-#include "stdafx.h"
 #include "zlog.h"
 
 #ifdef PLATFORM_WIN32
@@ -103,6 +102,21 @@ namespace zlog
 		return string(buf);
 	}
 
+	string get_file_name(const char *path, int len)
+	{
+		int i = len - 1;
+		for (; i >= 0; i--)
+		{
+			if (path[i] == '\\' || path[i] == '/')
+			{
+				i++;
+				break;
+			}
+		}
+
+		return string(path + i);
+	}
+
 	void open_log_file(FILE **file)
 	{
 #ifdef PLATFORM_WIN32
@@ -110,21 +124,9 @@ namespace zlog
 #endif
 
 		auto len = log_config.cur_prog_name.length();
-		auto p = log_config.cur_prog_name.c_str();
-		size_t i = 0;
-
-		for (i = len; i >= 0; i--)
-		{
-			if (p[i] == '\\' || p[i] == '/')
-			{
-				i++;
-				break;
-			}
-		}
-
-		string progname = p + i;
+		auto progname = get_file_name(log_config.cur_prog_name.c_str(), len);
 		auto log_name = log_config.log_dir + progname + "_" + int_to_str(pid_) + ".log";
-		const size_t old_log_size_ = get_size_in_byte(log_name);
+		const auto old_log_size_ = get_size_in_byte(log_name);
 
 		if (old_log_size_ >= log_config.max_byte)
 			// 覆盖
@@ -141,13 +143,9 @@ namespace zlog
 		}
 	}
 
-	void log_to_stream(FILE *log_stream, LogLevel_t level, const char *file, int line, const char *fmt, ...)
+	void log_to_stream(FILE *log_stream, LogLevel_t level, const char *file, const char *fn, int line, const char *fmt, ...)
 	{
-
-		fprintf(log_stream, "[%s] [%s] [%d] ", LogLevelName[level], get_current_date().c_str(), line);
-
-		if (level <= LOG_DEBUG)
-			fprintf(log_stream, "%s:%d ", file, line);
+		fprintf(log_stream, "[%s] [%s] [%s:%s:%d] ", LogLevelName[level], get_current_date().c_str(), get_file_name(file, strlen(file)).c_str(), fn, line);
 
 		va_list ap_;
 		va_start(ap_, fmt);
@@ -158,7 +156,7 @@ namespace zlog
 	}
 
 	void _print_log(
-		LogLevel_t level, const char *file, int line, const char *fmt, ...)
+		LogLevel_t level, const char *file, const char *fn, int line, const char *fmt, ...)
 	{
 		// 关闭日志
 		if (level == LOG_OFF)
@@ -208,9 +206,9 @@ namespace zlog
 		va_start(ap_, fmt);
 
 		if (log_std != nullptr && level > log_config.level)
-			log_to_stream(log_std, level, file, line, fmt, ap_);
+			log_to_stream(log_std, level, file, fn, line, fmt, ap_);
 		if (log_file != nullptr && log_config.use_file_output)
-			log_to_stream(log_file, level, file, line, fmt, ap_);
+			log_to_stream(log_file, level, file, fn, line, fmt, ap_);
 
 		va_end(ap_);
 	}
