@@ -39,11 +39,11 @@ namespace zlog
 	static FILE *log_std = nullptr;
 	static bool haveInit = false;
 	static const char *LogLevelName[] = {"TRACE", "DEBUG", "INFO ", "WARN ", "ERROR", "FATAL", " OFF "};
+	char *buff = new char[1024];
 
 #ifdef PLATFORM_WIN32
 	// 104857600 byte == 100 MiB
 	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "", true, "demo.exe"};
-	char *buff = new char[1024];
 	static int pid_ = _getpid();
 
 	string getTempDir()
@@ -161,7 +161,6 @@ namespace zlog
 		while (true)
 		{
 			std::this_thread::sleep_for(std::chrono::seconds(60));
-			printf("running");
 
 			if (log_file != nullptr)
 				fflush(log_file);
