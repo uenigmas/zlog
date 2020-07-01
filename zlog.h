@@ -1,4 +1,4 @@
-﻿/*
+/*
  * zlog.h
  *
  *  Created on: 2014年9月30日
@@ -20,8 +20,8 @@
 
 #endif
 
+#include <iostream>
 #include <string>
-using namespace std;
 
 namespace zlog
 {
@@ -41,7 +41,7 @@ namespace zlog
 		LOG_WARN,
 		LOG_ERROR,
 		LOG_FATAL,
-		LOG_OFF
+		LOG_OFF,
 	} LogLevel_t;
 
 	typedef struct
@@ -49,23 +49,54 @@ namespace zlog
 		LogLevel_t level;
 		LogOutputStream_t output_to;
 		size_t max_byte;
-		string log_dir;
+		std::string log_dir;
 		bool use_file_output;
-		string cur_prog_name;
+		std::string cur_prog_name;
 	} LogConfig_t;
 
 	extern LogConfig_t log_config;
+	extern char *buff;
 
-#define trace_print(...) print_log(LOG_TRACE, __VA_ARGS__)
-#define debug_print(...) print_log(LOG_DEBUG, __VA_ARGS__)
-#define info_print(...) print_log(LOG_INFO, __VA_ARGS__)
-#define warn_print(...) print_log(LOG_WARN, __VA_ARGS__)
-#define error_print(...) print_log(LOG_ERROR, __VA_ARGS__)
-#define fatal_print(...) print_log(LOG_FATAL, __VA_ARGS__)
+#define trace_print(msg)               \
+	if (LOG_TRACE >= log_config.level) \
+		std::cout << "[trace] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-#define print_log(level, ...) _print_log(level, __FILE__, __FUNCTION__, __LINE__, __VA_ARGS__)
+#define debug_print(msg)               \
+	if (LOG_DEBUG >= log_config.level) \
+		std::cout << "[debug] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-	void _print_log(LogLevel_t level, const char *file, const char *fn, int line, const char *fmt, ...);
+#define info_print(msg)               \
+	if (LOG_INFO >= log_config.level) \
+		std::cout << "[info] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+
+#define warn_print(msg)               \
+	if (LOG_WARN >= log_config.level) \
+		std::cout << "[warn] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+
+#define error_print(msg)               \
+	if (LOG_ERROR >= log_config.level) \
+		std::cout << "[error] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+
+#define fatal_print(msg)               \
+	if (LOG_FATAL >= log_config.level) \
+		std::cout << "[fatal] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+
+#define trace_log(...) print_log(LOG_TRACE, __VA_ARGS__)
+#define debug_log(...) print_log(LOG_DEBUG, __VA_ARGS__)
+#define info_log(...) print_log(LOG_INFO, __VA_ARGS__)
+#define warn_log(...) print_log(LOG_WARN, __VA_ARGS__)
+#define error_log(...) print_log(LOG_ERROR, __VA_ARGS__)
+#define fatal_log(...) print_log(LOG_FATAL, __VA_ARGS__)
+
+#define print_log(level, ...)                                \
+	{                                                        \
+		sprintf(buff, __VA_ARGS__);                          \
+		_print_log(level, __FILE__, __FUNCTION__, __LINE__); \
+	}
+
+	void _print_log(LogLevel_t level, const char *file, const char *fn, int line);
+
+	void set_log_buffer_size(int size);
 
 	void close_log_stream();
 
