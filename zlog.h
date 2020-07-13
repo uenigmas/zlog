@@ -20,6 +20,8 @@
 
 #endif
 
+#define IS_ZLOG_ENABLE 1
+
 #include <iostream>
 #include <string>
 
@@ -59,6 +61,8 @@ namespace zlog
 	extern LogConfig_t log_config;
 	extern char *buff;
 
+#if IS_ZLOG_ENABLE
+
 #define trace_print(msg)                     \
 	if (LOG_TRACE >= zlog::log_config.level) \
 		std::cout << "[trace] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
@@ -95,6 +99,26 @@ namespace zlog
 		sprintf(zlog::buff, __VA_ARGS__);                          \
 		zlog::_print_log(level, __FILE__, __FUNCTION__, __LINE__); \
 	}
+
+#else
+
+#define trace_print(msg) {}
+#define debug_print(msg) {}
+#define info_print(msg) {}
+#define warn_print(msg) {}
+#define error_print(msg) {}
+#define fatal_print(msg) {}
+
+#define trace_log(...) {}
+#define debug_log(...) {}
+#define info_log(...) {}
+#define warn_log(...) {}
+#define error_log(...) {}
+#define fatal_log(...) {}
+
+#define print_log(level, ...) {}
+
+#endif
 
 	void _print_log(LogLevel_t level, const char *file, const char *fn, int line);
 

@@ -42,10 +42,6 @@ namespace zlog
 	char *buff = new char[1024];
 
 #ifdef PLATFORM_WIN32
-	// 104857600 byte == 100 MiB
-	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "", "demo.exe", true, 60};
-	static int pid_ = _getpid();
-
 	string getTempDir()
 	{
 		char userpath[512] = {};
@@ -58,6 +54,11 @@ namespace zlog
 		sprintf(userpath, mode, cname);
 		return string(userpath);
 	}
+
+	// 104857600 byte == 100 MiB
+	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, getTempDir(), "demo.exe", true, 60};
+	static int pid_ = _getpid();
+
 #else
 	// 104857600 byte == 100 MiB
 	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "/tmp/", "demo.exe", true, 60};
@@ -97,11 +98,11 @@ namespace zlog
 	}
 
 	// 获取当前时间,比如 2011-11-16 14:06:36
-	string get_current_date()
+	string get_current_date(char *format = "%Y-%m-%d %H:%M:%S")
 	{
 		char buf[80];
 		time_t t = time(nullptr);
-		strftime(buf, 80, "%Y-%m-%d %H:%M:%S", localtime(&t));
+		strftime(buf, 80, format, localtime(&t));
 		return string(buf);
 	}
 
@@ -123,13 +124,9 @@ namespace zlog
 
 	void open_log_file(FILE **file)
 	{
-#ifdef PLATFORM_WIN32
-		log_config.log_dir = getTempDir();
-#endif
-
 		auto len = log_config.cur_prog_name.length();
 		auto progname = get_file_name(log_config.cur_prog_name.c_str(), len);
-		auto log_name = log_config.log_dir + progname + "_" + int_to_str(pid_) + ".log";
+		auto log_name = log_config.log_dir + progname + get_current_date("_%Y-%m-%d %H-%M-%S_") + int_to_str(pid_) + ".log";
 		const auto old_log_size_ = get_size_in_byte(log_name);
 
 		if(old_log_size_ >= log_config.max_byte)
