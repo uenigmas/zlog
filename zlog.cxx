@@ -23,6 +23,7 @@
 #include <ctime>
 #include <iostream>
 #include <thread>
+#include <mutex>
 
 using namespace std;
 
@@ -40,6 +41,7 @@ namespace zlog
 	static bool haveInit = false;
 	static const char *LogLevelName[] = {"TRACE", "DEBUG", "INFO ", "WARN ", "ERROR", "FATAL", " OFF "};
 	char *buff = new char[1024];
+	static mutex mu;
 
 #ifdef PLATFORM_WIN32
 	string getTempDir()
@@ -159,8 +161,10 @@ namespace zlog
 		{
 			std::this_thread::sleep_for(std::chrono::seconds(log_config.flush_interval));
 
+			mu.lock();
 			if(log_file != nullptr)
 				fflush(log_file);
+			mu.unlock();
 		}
 	}
 
@@ -206,24 +210,32 @@ namespace zlog
 		if(log_std != nullptr && level > log_config.level)
 			log_to_stream(log_std, level, file, fn, line, buff);
 
+		mu.lock();
 		if(log_file != nullptr && log_config.use_file_output)
 			log_to_stream(log_file, level, file, fn, line, buff);
+		mu.unlock();
 	}
 
 	void flush_log_stream()
 	{
-		fflush(log_std);
+		mu.lock();
 
+		fflush(log_std);
 		fflush(log_file);
+
+		mu.unlock();
 	}
 
 	void close_log_stream()
 	{
-		fflush(log_std);
+		mu.lock();
 
+		fflush(log_std);
 		fflush(log_file);
 		fclose(log_file);
 		log_file = nullptr;
+
+		mu.unlock();
 	}
 
 	void set_log_buffer_size(int size)
