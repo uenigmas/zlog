@@ -53,6 +53,7 @@ namespace zlog
 		std::string log_dir;
 		std::string cur_prog_name;
 		bool use_file_output;
+		int flush_interval;
 	} LogConfig_t;
 
 	extern LogConfig_t log_config;

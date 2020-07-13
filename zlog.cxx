@@ -43,7 +43,7 @@ namespace zlog
 
 #ifdef PLATFORM_WIN32
 	// 104857600 byte == 100 MiB
-	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "", "demo.exe", true};
+	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "", "demo.exe", true, 60};
 	static int pid_ = _getpid();
 
 	string getTempDir()
@@ -60,7 +60,7 @@ namespace zlog
 	}
 #else
 	// 104857600 byte == 100 MiB
-	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "/tmp/", "demo.exe", true};
+	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "/tmp/", "demo.exe", true, 60};
 	static int pid_ = getpid();
 #endif
 
@@ -160,7 +160,7 @@ namespace zlog
 	{
 		while(true)
 		{
-			std::this_thread::sleep_for(std::chrono::seconds(60));
+			std::this_thread::sleep_for(std::chrono::seconds(log_config.flush_interval));
 
 			if(log_file != nullptr)
 				fflush(log_file);
