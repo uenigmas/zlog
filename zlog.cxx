@@ -43,7 +43,7 @@ namespace zlog
 
 #ifdef PLATFORM_WIN32
 	// 104857600 byte == 100 MiB
-	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "", true, "demo.exe"};
+	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "", "demo.exe", true};
 	static int pid_ = _getpid();
 
 	string getTempDir()
@@ -60,7 +60,7 @@ namespace zlog
 	}
 #else
 	// 104857600 byte == 100 MiB
-	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "/tmp/", true, "demo.exe"};
+	LogConfig_t log_config = {LOG_INFO, LOGOUTPUTSTREAM_STDOUT, 104857600, "/tmp/", "demo.exe", true};
 	static int pid_ = getpid();
 #endif
 
@@ -77,7 +77,7 @@ namespace zlog
 		string msg_(_strerror(NULL));
 		const size_t size_ = msg_.size();
 
-		if (size_)
+		if(size_)
 			msg_.erase(size_ - 1);
 
 		return msg_ + "(errno: " + int_to_str(errno) + ")";
@@ -90,7 +90,7 @@ namespace zlog
 	{
 		struct stat buf_;
 
-		if (stat(file_name.c_str(), &buf_) == 0)
+		if(stat(file_name.c_str(), &buf_) == 0)
 			return static_cast<size_t>(buf_.st_size);
 
 		return 0;
@@ -109,9 +109,9 @@ namespace zlog
 	{
 		int i = len - 1;
 
-		for (; i >= 0; i--)
+		for(; i >= 0; i--)
 		{
-			if (path[i] == '\\' || path[i] == '/')
+			if(path[i] == '\\' || path[i] == '/')
 			{
 				i++;
 				break;
@@ -132,14 +132,14 @@ namespace zlog
 		auto log_name = log_config.log_dir + progname + "_" + int_to_str(pid_) + ".log";
 		const auto old_log_size_ = get_size_in_byte(log_name);
 
-		if (old_log_size_ >= log_config.max_byte)
+		if(old_log_size_ >= log_config.max_byte)
 			// 覆盖
 			*file = fopen(log_name.c_str(), "wb");
 		else
 			// 追加
 			*file = fopen(log_name.c_str(), "ab+");
 
-		if (*file == nullptr)
+		if(*file == nullptr)
 		{
 			const string err_("cannot open \"" + log_config.log_dir + "\": " + errno_to_str());
 			cerr << err_ << endl;
@@ -158,11 +158,11 @@ namespace zlog
 
 	void flush_file()
 	{
-		while (true)
+		while(true)
 		{
 			std::this_thread::sleep_for(std::chrono::seconds(60));
 
-			if (log_file != nullptr)
+			if(log_file != nullptr)
 				fflush(log_file);
 		}
 	}
@@ -170,43 +170,54 @@ namespace zlog
 	void _print_log(LogLevel_t level, const char *file, const char *fn, int line)
 	{
 		// 关闭日志
-		if (level == LOG_OFF)
+		if(level == LOG_OFF)
 			return;
 
-		if (haveInit == false)
+		if(haveInit == false)
 		{
 			haveInit = true;
 			(new thread(flush_file))->detach();
-		}
 
-		if (log_std == nullptr)
-		{
-			switch (log_config.output_to)
+			if(log_std == nullptr)
 			{
-			case LOGOUTPUTSTREAM_STDOUT:
-				log_std = stdout;
-				break;
+				switch(log_config.output_to)
+				{
+				case LOGOUTPUTSTREAM_STDOUT:
+					log_std = stdout;
+					break;
 
-			case LOGOUTPUTSTREAM_STDERR:
-				log_std = stderr;
-				break;
+				case LOGOUTPUTSTREAM_STDERR:
+					log_std = stderr;
+					break;
 
-			case LOGOUTPUTSTREAM_FILE:
-				//log_std = ostringstream();
-				break;
+				case LOGOUTPUTSTREAM_FILE:
+					//log_std = ostringstream();
+					break;
+
+				case LOGOUTPUTSTREAM_NULL:
+					log_std = nullptr;
+					break;
+				}
+			}
+
+			if(log_file == nullptr && log_config.use_file_output)
+			{
+				open_log_file(&log_file);
 			}
 		}
 
-		if (log_file == nullptr)
-		{
-			open_log_file(&log_file);
-		}
-
-		if (log_std != nullptr && level > log_config.level)
+		if(log_std != nullptr && level > log_config.level)
 			log_to_stream(log_std, level, file, fn, line, buff);
 
-		if (log_file != nullptr && log_config.use_file_output)
+		if(log_file != nullptr && log_config.use_file_output)
 			log_to_stream(log_file, level, file, fn, line, buff);
+	}
+
+	void flush_log_stream()
+	{
+		fflush(log_std);
+
+		fflush(log_file);
 	}
 
 	void close_log_stream()
