@@ -6,9 +6,7 @@ enable_testing()
 
 aux_source_directory(../ DIR_SRCS)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-	link_libraries(pthread)
-elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+if(CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD")
 	link_libraries(pthread)
 endif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
