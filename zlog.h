@@ -8,7 +8,7 @@
 
 #pragma once
 
- // Platform recognition
+// Platform recognition
 #if defined(WIN32) || defined(_WIN32)
 #define PLATFORM_WIN32 1
 
@@ -63,28 +63,28 @@ namespace zlog
 
 #if IS_ZLOG_ENABLE
 
-#define trace_print(msg)                     \
-	if (LOG_TRACE >= zlog::log_config.level) \
+#define trace_print(msg)                           \
+	if (zlog::LOG_TRACE >= zlog::log_config.level) \
 		std::cout << "[trace] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-#define debug_print(msg)                     \
-	if (LOG_DEBUG >= zlog::log_config.level) \
+#define debug_print(msg)                           \
+	if (zlog::LOG_DEBUG >= zlog::log_config.level) \
 		std::cout << "[debug] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-#define info_print(msg)                     \
-	if (LOG_INFO >= zlog::log_config.level) \
+#define info_print(msg)                           \
+	if (zlog::LOG_INFO >= zlog::log_config.level) \
 		std::cout << "[info] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-#define warn_print(msg)                     \
-	if (LOG_WARN >= zlog::log_config.level) \
+#define warn_print(msg)                           \
+	if (zlog::LOG_WARN >= zlog::log_config.level) \
 		std::cout << "[warn] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-#define error_print(msg)                     \
-	if (LOG_ERROR >= zlog::log_config.level) \
+#define error_print(msg)                           \
+	if (zlog::LOG_ERROR >= zlog::log_config.level) \
 		std::cout << "[error] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
-#define fatal_print(msg)                     \
-	if (LOG_FATAL >= zlog::log_config.level) \
+#define fatal_print(msg)                           \
+	if (zlog::LOG_FATAL >= zlog::log_config.level) \
 		std::cout << "[fatal] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
 
 #define trace_log(...) print_log(zlog::LOG_TRACE, __VA_ARGS__)
@@ -102,21 +102,47 @@ namespace zlog
 
 #else
 
-#define trace_print(msg) {}
-#define debug_print(msg) {}
-#define info_print(msg) {}
-#define warn_print(msg) {}
-#define error_print(msg) {}
-#define fatal_print(msg) {}
+#define trace_print(msg) \
+	{                    \
+	}
+#define debug_print(msg) \
+	{                    \
+	}
+#define info_print(msg) \
+	{                   \
+	}
+#define warn_print(msg) \
+	{                   \
+	}
+#define error_print(msg) \
+	{                    \
+	}
+#define fatal_print(msg) \
+	{                    \
+	}
 
-#define trace_log(...) {}
-#define debug_log(...) {}
-#define info_log(...) {}
-#define warn_log(...) {}
-#define error_log(...) {}
-#define fatal_log(...) {}
+#define trace_log(...) \
+	{                  \
+	}
+#define debug_log(...) \
+	{                  \
+	}
+#define info_log(...) \
+	{                 \
+	}
+#define warn_log(...) \
+	{                 \
+	}
+#define error_log(...) \
+	{                  \
+	}
+#define fatal_log(...) \
+	{                  \
+	}
 
-#define print_log(level, ...) {}
+#define print_log(level, ...) \
+	{                         \
+	}
 
 #endif
 
