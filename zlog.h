@@ -65,27 +65,27 @@ namespace zlog
 
 #define trace_print(msg)                           \
 	if (zlog::LOG_TRACE >= zlog::log_config.level) \
-		std::cout << "[trace] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+		std::cout << "[trace] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << std::endl;
 
 #define debug_print(msg)                           \
 	if (zlog::LOG_DEBUG >= zlog::log_config.level) \
-		std::cout << "[debug] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+		std::cout << "[debug] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << std::endl;
 
 #define info_print(msg)                           \
 	if (zlog::LOG_INFO >= zlog::log_config.level) \
-		std::cout << "[info] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+		std::cout << "[info] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << std::endl;
 
 #define warn_print(msg)                           \
 	if (zlog::LOG_WARN >= zlog::log_config.level) \
-		std::cout << "[warn] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+		std::cout << "[warn] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << std::endl;
 
 #define error_print(msg)                           \
 	if (zlog::LOG_ERROR >= zlog::log_config.level) \
-		std::cout << "[error] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+		std::cout << "[error] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << std::endl;
 
 #define fatal_print(msg)                           \
 	if (zlog::LOG_FATAL >= zlog::log_config.level) \
-		std::cout << "[fatal] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << endl;
+		std::cout << "[fatal] [" << __FILE__ << "] [" << __FUNCTION__ << ":" << __LINE__ << "] " << msg << std::endl;
 
 #define trace_log(...) print_log(zlog::LOG_TRACE, __VA_ARGS__)
 #define debug_log(...) print_log(zlog::LOG_DEBUG, __VA_ARGS__)
