@@ -3,9 +3,10 @@
 using namespace std;
 using namespace zlog;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-    log_config.level = LOG_INFO;
+    log_config.display_level = LOG_WARN;
+    log_config.output_level = LOG_WARN;
     log_config.cur_prog_name = argv[0];
     log_config.use_file_output = false;
 
